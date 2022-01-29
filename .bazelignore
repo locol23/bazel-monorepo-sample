@@ -1,0 +1,3 @@
+node_modules
+bff/services/graphql/node_modules
+frontend/apps/ui/node_modules

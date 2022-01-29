@@ -1,0 +1,22 @@
+{
+  "name": "bazel-monorepo-sample",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "clean": "bazel clean",
+    "build": "bazel build //...",
+    "docker": "run-p docker:*",
+    "docker:frontend": "bazel run --platforms=@build_bazel_rules_nodejs//toolchains/node:linux_amd64 //frontend/apps/ui:docker",
+    "docker:bff": "bazel run --platforms=@build_bazel_rules_nodejs//toolchains/node:linux_amd64 //bff/services/graphql:docker",
+    "test": "bazel test //...",
+    "dev": "run-p dev:*",
+    "dev:bff": "ibazel run //bff/services/graphql:server",
+    "dev:frontend": "ibazel run //frontend/apps/ui:dev"
+  },
+  "devDependencies": {
+    "@bazel/bazelisk": "latest",
+    "@bazel/buildifier": "latest",
+    "@bazel/ibazel": "latest",
+    "npm-run-all": "^4.1.5"
+  }
+}

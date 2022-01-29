@@ -1,0 +1,59 @@
+load("@build_bazel_rules_nodejs//:index.bzl", "nodejs_binary")
+load("@npm_bff_graphql//@bazel/typescript:index.bzl", "ts_config", "ts_project")
+
+package(default_visibility = ["//visibility:public"])
+
+ts_config(
+    name = "tsconfig",
+    src = "//bff/services/graphql:tsconfig.build.json",
+    deps = [
+        "//bff/services/graphql:tsconfig.build.json",
+        "//bff/services/graphql:tsconfig.json",
+    ],
+)
+
+ts_project(
+    name = "app",
+    srcs = glob(
+        ["src/**/*.ts"],
+        exclude = ["src/**/*.spec.ts"],
+    ),
+    declaration = True,
+    incremental = True,
+    source_map = True,
+    tsconfig = ":tsconfig",
+    deps = [
+        "@npm_bff_graphql//@nestjs/common",
+        "@npm_bff_graphql//@nestjs/core",
+        "@npm_bff_graphql//@nestjs/platform-express",
+        "@npm_bff_graphql//@types/node",
+        "@npm_bff_graphql//tslib",
+    ],
+)
+
+filegroup(
+    name = "sources",
+    srcs = glob([
+        "src/**/*.ts",
+    ]),
+)
+
+filegroup(
+    name = "config",
+    srcs = [
+        ":nest-cli.json",
+        ":tsconfig.build.json",
+        ":tsconfig.json",
+    ],
+)
+
+nodejs_binary(
+    name = "server",
+    data = [
+        ":app",
+        "@npm_bff_graphql//@nestjs/common",
+        "@npm_bff_graphql//@nestjs/core",
+    ],
+    entry_point = ":src/main.ts",
+)
+

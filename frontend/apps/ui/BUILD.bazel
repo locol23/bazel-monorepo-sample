@@ -1,0 +1,57 @@
+load("@build_bazel_rules_nodejs//:index.bzl", "copy_to_bin")
+load("@npm_frontend_ui//next:index.bzl", "next")
+
+filegroup(
+    name = "source_files",
+    srcs = glob([
+        "public/**/*",
+        "src/**/*",
+    ]) + [
+        "tsconfig.json",
+        "next.config.js",
+        "next-env.d.ts",
+        "package.json",
+        "yarn.lock",
+    ],
+)
+
+copy_to_bin(
+    name = "bin_source_files",
+    srcs = [":source_files"],
+)
+
+DEPS = [
+    "@npm_frontend_ui//@types/react",
+    "@npm_frontend_ui//react",
+    "@npm_frontend_ui//react-dom",
+    "@npm_frontend_ui//typescript",
+]
+
+next(
+    name = "build",
+    outs = [
+        ".next",
+    ],
+    args = [
+        "build",
+        "$(RULEDIR)",
+    ],
+    data = [
+        ":bin_source_files",
+    ] + DEPS
+)
+
+next(
+    name = "dev",
+    args = [
+        "dev ./frontend/apps/ui",
+        "--node_options=--preserve-symlinks-main",
+        "--bazel_run_from_execroot",
+    ],
+    data = [":bin_source_files"] + DEPS,
+    tags = [
+        "ibazel_notify_changes",
+    ],
+    templated_args = ["--bazel_patch_module_resolver"],
+)
+
